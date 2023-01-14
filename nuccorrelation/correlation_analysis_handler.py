@@ -4,6 +4,7 @@ from scipy.stats import pearsonr
 from sklearn import linear_model
 import numpy as np
 from sklearn.preprocessing import minmax_scale
+from dtw import dtw
 
 ASSUMED_NUC_REACTOR_EFFICIENCY = 0.38
 
@@ -52,7 +53,8 @@ class CorrelationAnalysisHandler():
                            .pivot(index='Country', columns='Year', values='primary_ej')
                            .transpose())
 
-        WORLD_BANK_DROP_COLS: List[str] = ["Country Code", "Indicator Name", "Indicator Code", "Unnamed: 66"]
+        WORLD_BANK_DROP_COLS: List[str] = [
+            "Country Code", "Indicator Name", "Indicator Code", "Unnamed: 66"]
         WORLD_BANK_RENAME_COUNTRIES: Dict[str, str] = {
             "Trinidad and Tobago": "Trinidad & Tobago",
             "Turkiye": "Turkey",
@@ -127,13 +129,21 @@ class CorrelationAnalysisHandler():
             values.append(stat)
         return pd.Series(values, index=self.common_countries)
 
+    def get_dtw_distance_for_country_dfs(self, df_1: pd.DataFrame, df_2: pd.DataFrame) -> pd.Series:
+        values = []
+        for country in self.common_countries:
+            d, cost_matrix, acc_cost_matrix, path = dtw(np.array(
+                df_1[country].tolist()), np.array(df_2[country].tolist()), dist=euclidean_distance)
+            values.append(d)
+        return pd.Series(values, index=self.common_countries)
+
     def get_trend_coefs_by_country(self, y: pd.DataFrame) -> pd.Series:
         beta = []
         x = np.reshape([i for i in range(0, y.shape[0])], (-1, 1)) / y.shape[0]
         y_scale = minmax_scale(y)
         for country in self.common_countries:
             lin_mod = linear_model.LinearRegression()
-            lin_mod.fit(x, y_scale[:,self.common_countries.index(country)])
+            lin_mod.fit(x, y_scale[:, self.common_countries.index(country)])
             beta.append(lin_mod.coef_[0])
         return pd.Series(beta, index=self.common_countries)
 
@@ -144,21 +154,30 @@ class CorrelationAnalysisHandler():
             self.df_co2, self.df_nuc_primary_share)
         series_nuc_nuc_prim = self.get_pearson_corr_for_country_dfs(
             self.df_nuc_twh, self.df_nuc_primary_share)
-        series_beta_trends = self.get_trend_coefs_by_country(self.df_primary / self.df_pop)
-        series_beta_nuc_trends = self.get_trend_coefs_by_country(self.df_nuc_primary_share)
+        series_beta_trends = self.get_trend_coefs_by_country(
+            self.df_primary / self.df_pop)
+        series_beta_nuc_trends = self.get_trend_coefs_by_country(
+            self.df_nuc_primary_share)
+        series_dtw_dist_raw = self.get_dtw_distance_for_country_dfs(
+            self.df_co2, self.df_nuc_primary_share)
+        series_dtw_dist_norm = pd.Series(minmax_scale(
+            series_dtw_dist_raw), index=series_dtw_dist_raw.index)
         df_corrs = pd.concat(
             [
                 series_co2_nuc,
                 series_c02_nuc_prim,
                 series_nuc_nuc_prim,
                 series_beta_trends,
-                series_beta_nuc_trends
+                series_beta_nuc_trends,
+                series_dtw_dist_raw,
+                series_dtw_dist_norm
             ],
             axis=1
         ).transpose()
         df_corrs["ind"] = ["COR: CO2 v. Nuclear in TWh", "COR: CO2 vs nuclear share in primary",
                            "COR: Nuclear in TWh vs share in primary", "Trend: Primary energy consumption",
-                           "Trend: Nuclear energy share"]
+                           "Trend: Nuclear energy share", "DTW: CO2 vs nuclear share in primary",
+                           "DTW: CO2 vs nuclear share in primary (Normalized)"]
         df_corrs = df_corrs.set_index("ind")
         return df_corrs
 
@@ -173,3 +192,6 @@ def to_twh(colname: str, value: float) -> float:
     raise Exception(
         f"column with name \"{colname}\" cannot be converted to twh! no known conversion!")
 
+
+def euclidean_distance(x: float, y: float) -> float:
+    return np.abs(x - y)

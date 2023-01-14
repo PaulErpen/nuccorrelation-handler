@@ -1,6 +1,6 @@
 import unittest
-
-from nuccorrelation.correlation_analysis_handler import CorrelationAnalysisHandler
+import numpy as np
+from nuccorrelation.correlation_analysis_handler import CorrelationAnalysisHandler, euclidean_distance
 
 COMMON_COUNTRIES = [
     'Argentina',
@@ -241,7 +241,7 @@ class CorrelationAnalysisHandlerTest(unittest.TestCase):
         )
         self.assertEqual(
             handler.get_aggregated_stats_by_country().shape,
-            (5, 26)
+            (7, 26)
         )
 
     def test_get_aggregated_stats_by_country_colnames(self):
@@ -265,7 +265,8 @@ class CorrelationAnalysisHandlerTest(unittest.TestCase):
             handler.get_aggregated_stats_by_country().index,
             ["COR: CO2 v. Nuclear in TWh", "COR: CO2 vs nuclear share in primary",
              "COR: Nuclear in TWh vs share in primary", "Trend: Primary energy consumption",
-             "Trend: Nuclear energy share"]
+             "Trend: Nuclear energy share", "DTW: CO2 vs nuclear share in primary",
+             "DTW: CO2 vs nuclear share in primary (Normalized)"]
         )
 
     def test_get_trend_coefs_by_country_shape(self):
@@ -289,6 +290,18 @@ class CorrelationAnalysisHandlerTest(unittest.TestCase):
             handler.get_trend_coefs_by_country(
                 handler.df_primary / handler.df_pop)["Pakistan"],
             0.90482224
+        )
+
+    def test_get_dtw_distance_for_country_dfs(self):
+        handler = CorrelationAnalysisHandler.from_paths(
+            PATH_BP_STATS,
+            PATH_CO2,
+            PATH_POP
+        )
+        self.assertCountEqual(
+            handler.get_dtw_distance_for_country_dfs(
+                handler.df_co2, handler.df_nuc_primary_share).index,
+            COMMON_COUNTRIES
         )
 
 
