@@ -141,7 +141,10 @@ class CorrelationAnalysisHandler():
     def get_pearson_corr_for_country_dfs(self, df_1: pd.DataFrame, df_2: pd.DataFrame) -> pd.Series:
         values = []
         for country in self.common_countries:
-            stat, other = pearsonr(df_1[country], df_2[country])
+            constant_series = df_1[country].nunique() == 1 or df_2[country].unique()
+            stat = np.NaN
+            if not constant_series:
+                stat, other = pearsonr(df_1[country], df_2[country])
             values.append(stat)
         return pd.Series(values, index=self.common_countries)
 
