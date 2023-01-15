@@ -31,6 +31,103 @@ COMMON_COUNTRIES = [
     'United Kingdom'
 ]
 
+COMMON_COUNTRIES_BEFORE_PREPROCESSING = [
+    "Colombia",
+    "Austria",
+    "Papua New Guinea",
+    "China",
+    "Equatorial Guinea",
+    "Philippines",
+    "Germany",
+    "Cyprus",
+    "Azerbaijan",
+    "Turkmenistan",
+    "Kuwait",
+    "Total World",
+    "Trinidad & Tobago",
+    "Italy",
+    "Bahrain",
+    "Peru",
+    "Oman",
+    "Croatia",
+    "Belarus",
+    "Mexico",
+    "Thailand",
+    "Ecuador",
+    "Iceland",
+    "Tunisia",
+    "Japan",
+    "Australia",
+    "Algeria",
+    "Chile",
+    "Ireland",
+    "Morocco",
+    "Bangladesh",
+    "Denmark",
+    "Spain",
+    "Madagascar",
+    "Sudan",
+    "Poland",
+    "Lithuania",
+    "Finland",
+    "Zimbabwe",
+    "Malaysia",
+    "Greece",
+    "Canada",
+    "Saudi Arabia",
+    "Kazakhstan",
+    "Pakistan",
+    "Hungary",
+    "Singapore",
+    "Argentina",
+    "Brazil",
+    "New Zealand",
+    "Sweden",
+    "Mongolia",
+    "Curacao",
+    "United Kingdom",
+    "Belgium",
+    "Chad",
+    "Netherlands",
+    "South Africa",
+    "Serbia",
+    "Turkey",
+    "India",
+    "Romania",
+    "Slovenia",
+    "New Caledonia",
+    "Gabon",
+    "Nigeria",
+    "Sri Lanka",
+    "Cuba",
+    "Switzerland",
+    "Bulgaria",
+    "France",
+    "Uzbekistan",
+    "Libya",
+    "North Macedonia",
+    "Norway",
+    "Vietnam",
+    "Ukraine",
+    "Mozambique",
+    "Qatar",
+    "Venezuela",
+    "Myanmar",
+    "Iraq",
+    "Estonia",
+    "Indonesia",
+    "Israel",
+    "Bolivia",
+    "Zambia",
+    "Angola",
+    "South Sudan",
+    "Luxembourg",
+    "United Arab Emirates",
+    "Russian Federation",
+    "Portugal",
+    "Latvia"
+]
+
 PATH_BP_STATS = "../raw-data/bp-stats-review.csv"
 PATH_CO2 = "../raw-data/co2_kt_world.csv"
 PATH_POP = "../raw-data/world_pop.csv"
@@ -302,6 +399,42 @@ class CorrelationAnalysisHandlerTest(unittest.TestCase):
             handler.get_dtw_distance_for_country_dfs(
                 handler.df_co2, handler.df_nuc_primary_share).index,
             COMMON_COUNTRIES
+        )
+    
+    def test_common_countries_before_preprocessing(self):
+        handler = CorrelationAnalysisHandler.from_paths(
+            PATH_BP_STATS,
+            PATH_CO2,
+            PATH_POP
+        )
+        self.maxDiff = None
+        self.assertCountEqual(
+            handler._common_countries_before_preprocessing,
+            COMMON_COUNTRIES_BEFORE_PREPROCESSING
+        )
+    
+    def test_co2_before_preprocessing_shape(self):
+        handler = CorrelationAnalysisHandler.from_paths(
+            PATH_BP_STATS,
+            PATH_CO2,
+            PATH_POP
+        )
+        self.maxDiff = None
+        self.assertEqual(
+            handler.df_co2_before_preprocessing.shape,
+            (62, 94)
+        )
+    
+    def test_co2_before_preprocessing_columns(self):
+        handler = CorrelationAnalysisHandler.from_paths(
+            PATH_BP_STATS,
+            PATH_CO2,
+            PATH_POP
+        )
+        self.maxDiff = None
+        self.assertCountEqual(
+            [str(s) for s in handler.df_co2_before_preprocessing.columns],
+            COMMON_COUNTRIES_BEFORE_PREPROCESSING
         )
 
 

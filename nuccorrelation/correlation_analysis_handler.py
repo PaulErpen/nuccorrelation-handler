@@ -13,9 +13,11 @@ class CorrelationAnalysisHandler():
     min_year: int
     max_year: int
     common_countries: List[str]
+    _common_countries_before_preprocessing: List[str]
     df_nuc_twh: pd.DataFrame
     df_nuc_primary_share: pd.DataFrame
     df_co2: pd.DataFrame
+    df_co2_before_preprocessing: pd.DataFrame
     df_primary: pd.DataFrame
     df_pop: pd.DataFrame
 
@@ -23,17 +25,21 @@ class CorrelationAnalysisHandler():
                  min_year: int,
                  max_year: int,
                  common_countries: List[str],
+                 _common_countries_before_preprocessing: List[str],
                  df_nuc_twh: pd.DataFrame,
                  df_nuc_primary_share: pd.DataFrame,
                  df_co2: pd.DataFrame,
+                 df_co2_before_preprocessing: pd.DataFrame,
                  df_primary: pd.DataFrame,
                  df_pop: pd.DataFrame) -> None:
         self.min_year = min_year
         self.max_year = max_year
         self.common_countries = common_countries
+        self._common_countries_before_preprocessing = _common_countries_before_preprocessing
         self.df_nuc_twh = df_nuc_twh
         self.df_nuc_primary_share = df_nuc_primary_share
         self.df_co2 = df_co2
+        self.df_co2_before_preprocessing = df_co2_before_preprocessing
         self.df_primary = df_primary
         self.df_pop = df_pop
 
@@ -71,6 +77,8 @@ class CorrelationAnalysisHandler():
         df_co2_temp.index = df_co2_temp.index.astype("int64")
         df_co2_temp.rename(WORLD_BANK_RENAME_COUNTRIES, inplace=True, axis=1)
 
+        df_co2_before_preprocessing = df_co2_temp.copy()
+
         df_pop_temp = (
             pd.read_csv(df_pop_path, skiprows=3)
             .drop(WORLD_BANK_DROP_COLS, axis="columns")
@@ -79,6 +87,12 @@ class CorrelationAnalysisHandler():
         )
         df_pop_temp.index = df_pop_temp.index.astype("int64")
         df_pop_temp.rename(WORLD_BANK_RENAME_COUNTRIES, inplace=True, axis=1)
+
+        common_countries_before_preprocessing = list(
+            {str(s) for s in df_co2_temp.columns}
+            .intersection({str(s) for s in df_pop_temp.columns})
+            .intersection({str(s) for s in df_primary_temp.columns})
+        )
 
         years_co2 = [
             int(str(i)) for i in df_co2_temp[df_co2_temp.notna().sum(axis=1) != 0].index]
@@ -115,9 +129,11 @@ class CorrelationAnalysisHandler():
             min_year=min_year,
             max_year=max_year,
             common_countries=common_countries,
+            _common_countries_before_preprocessing=common_countries_before_preprocessing,
             df_nuc_twh=df_nuc_temp[common_countries],
             df_nuc_primary_share=df_nuc_primary_share[common_countries],
             df_co2=df_co2_temp[common_countries],
+            df_co2_before_preprocessing=df_co2_before_preprocessing[common_countries_before_preprocessing],
             df_primary=df_primary_temp[common_countries],
             df_pop=df_pop_temp[common_countries]
         )
