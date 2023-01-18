@@ -361,7 +361,7 @@ class CorrelationAnalysisHandlerTest(unittest.TestCase):
         self.assertCountEqual(
             handler.get_aggregated_stats_by_country().index,
             ["COR: CO2 v. Nuclear in TWh", "COR: CO2 vs nuclear share in primary",
-             "COR: Nuclear in TWh vs share in primary", "Trend: Primary energy consumption",
+             "COR: Nuclear in TWh vs share in primary", "Trend: Primary energy production",
              "Trend: Nuclear energy share", "DTW: CO2 vs nuclear share in primary",
              "DTW: CO2 vs nuclear share in primary (Normalized)"]
         )

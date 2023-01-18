@@ -194,7 +194,7 @@ class CorrelationAnalysisHandler():
             axis=1
         ).transpose()
         df_corrs["ind"] = ["COR: CO2 v. Nuclear in TWh", "COR: CO2 vs nuclear share in primary",
-                           "COR: Nuclear in TWh vs share in primary", "Trend: Primary energy consumption",
+                           "COR: Nuclear in TWh vs share in primary", "Trend: Primary energy production",
                            "Trend: Nuclear energy share", "DTW: CO2 vs nuclear share in primary",
                            "DTW: CO2 vs nuclear share in primary (Normalized)"]
         df_corrs = df_corrs.set_index("ind")
