@@ -338,7 +338,7 @@ class CorrelationAnalysisHandlerTest(unittest.TestCase):
         )
         self.assertEqual(
             handler.get_aggregated_stats_by_country().shape,
-            (7, 26)
+            (8, 26)
         )
 
     def test_get_aggregated_stats_by_country_colnames(self):
@@ -362,7 +362,8 @@ class CorrelationAnalysisHandlerTest(unittest.TestCase):
             handler.get_aggregated_stats_by_country().index,
             ["COR: CO2 v. Nuclear in TWh", "COR: CO2 vs nuclear share in primary",
              "COR: Nuclear in TWh vs share in primary", "Trend: Primary energy production",
-             "Trend: Nuclear energy share", "DTW: CO2 vs nuclear share in primary",
+             "Trend: Nuclear energy share", "Trend: Nuclear power production in TWh",
+             "DTW: CO2 vs nuclear share in primary",
              "DTW: CO2 vs nuclear share in primary (Normalized)"]
         )
 
@@ -400,7 +401,7 @@ class CorrelationAnalysisHandlerTest(unittest.TestCase):
                 handler.df_co2, handler.df_nuc_primary_share).index,
             COMMON_COUNTRIES
         )
-    
+
     def test_common_countries_before_preprocessing(self):
         handler = CorrelationAnalysisHandler.from_paths(
             PATH_BP_STATS,
@@ -412,7 +413,7 @@ class CorrelationAnalysisHandlerTest(unittest.TestCase):
             handler._common_countries_before_preprocessing,
             COMMON_COUNTRIES_BEFORE_PREPROCESSING
         )
-    
+
     def test_co2_before_preprocessing_shape(self):
         handler = CorrelationAnalysisHandler.from_paths(
             PATH_BP_STATS,
@@ -424,7 +425,7 @@ class CorrelationAnalysisHandlerTest(unittest.TestCase):
             handler.df_co2_before_preprocessing.shape,
             (62, 94)
         )
-    
+
     def test_co2_before_preprocessing_columns(self):
         handler = CorrelationAnalysisHandler.from_paths(
             PATH_BP_STATS,

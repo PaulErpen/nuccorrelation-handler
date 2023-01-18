@@ -177,6 +177,8 @@ class CorrelationAnalysisHandler():
             self.df_primary / self.df_pop)
         series_beta_nuc_trends = self.get_trend_coefs_by_country(
             self.df_nuc_primary_share)
+        series_beta_nuc_twh_trends = self.get_trend_coefs_by_country(
+            self.df_nuc_twh)
         series_dtw_dist_raw = self.get_dtw_distance_for_country_dfs(
             self.df_co2, self.df_nuc_primary_share)
         series_dtw_dist_norm = pd.Series(minmax_scale(
@@ -188,6 +190,7 @@ class CorrelationAnalysisHandler():
                 series_nuc_nuc_prim,
                 series_beta_trends,
                 series_beta_nuc_trends,
+                series_beta_nuc_twh_trends,
                 series_dtw_dist_raw,
                 series_dtw_dist_norm
             ],
@@ -195,7 +198,8 @@ class CorrelationAnalysisHandler():
         ).transpose()
         df_corrs["ind"] = ["COR: CO2 v. Nuclear in TWh", "COR: CO2 vs nuclear share in primary",
                            "COR: Nuclear in TWh vs share in primary", "Trend: Primary energy production",
-                           "Trend: Nuclear energy share", "DTW: CO2 vs nuclear share in primary",
+                           "Trend: Nuclear energy share", "Trend: Nuclear power production in TWh",
+                           "DTW: CO2 vs nuclear share in primary",
                            "DTW: CO2 vs nuclear share in primary (Normalized)"]
         df_corrs = df_corrs.set_index("ind")
         return df_corrs
