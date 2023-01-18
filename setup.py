@@ -6,8 +6,7 @@ setup(
     packages=find_packages(include=["nuccorrelation"]),
     test_suite='tests_package',
     install_requires=[
-        "matplotlib>=3.6.3",
-        "matplotlib-inline>=0.1.6",
+        "matplotlib>=3.1.3",
         "numpy<1.23.0,>=1.16.5",
         "openpyxl>=3.0.10",
         "pandas>=1.5.2",
